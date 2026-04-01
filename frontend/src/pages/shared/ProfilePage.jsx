@@ -1,112 +1,162 @@
 // ============================================================
-// ProfilePage.jsx
-// Trang hồ sơ dùng chung cho cả 3 role.
-// Hiển thị thông tin từ JWT và cho phép đăng xuất.
+// ProfilePage.jsx - Full profile with avatar upload
 // ============================================================
-
-import { useNavigate }  from 'react-router-dom'
-import DashboardLayout  from '../../components/layout/DashboardLayout'
-import { useAuth }      from '../../context/AuthContext'
-import { getInitials }  from '../../utils/formatters'
-import { ROLES }        from '../../utils/constants'
-
-// Nav items tương ứng với từng role
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate }   from 'react-router-dom'
+import toast             from 'react-hot-toast'
+import DashboardLayout   from '../../components/layout/DashboardLayout'
+import LoadingSpinner    from '../../components/common/LoadingSpinner'
+import { useAuth }       from '../../context/AuthContext'
+import { getMyProfile, updateMyProfile } from '../../api/usersApi'
+import { getInitials }   from '../../utils/formatters'
+import { ROLES }         from '../../utils/constants'
 import { OWNER_NAV }  from '../owner/OwnerDashboard'
 import { ADMIN_NAV }  from '../admin/AdminDashboard'
 
 const RENTER_NAV = [
-  {
-    label: 'Tổng Quan',
-    items: [
-      { to: '/dashboard',          icon: '📊', label: 'Tổng Quan'     },
-      { to: '/dashboard/bookings', icon: '🗓️', label: 'Chuyến Của Tôi' },
-    ],
-  },
-  {
-    label: 'Tài Khoản',
-    items: [
-      { to: '/dashboard/profile', icon: '👤', label: 'Hồ Sơ'      },
-      { to: '/search',            icon: '🔍', label: 'Tìm Xe Mới' },
-    ],
-  },
+  { label: 'Tổng Quan', items: [
+    { to: '/dashboard',          icon: '📊', label: 'Tổng Quan'      },
+    { to: '/dashboard/bookings', icon: '🗓️', label: 'Chuyến Của Tôi' },
+  ]},
+  { label: 'Tài Khoản', items: [
+    { to: '/dashboard/profile', icon: '👤', label: 'Hồ Sơ'      },
+    { to: '/search',            icon: '🔍', label: 'Tìm Xe Mới' },
+  ]},
 ]
 
 export default function ProfilePage() {
   const { user, logout, isAdmin, isOwner } = useAuth()
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const fileRef   = useRef()
+  const navItems  = isAdmin ? ADMIN_NAV : isOwner ? OWNER_NAV : RENTER_NAV
 
-  // Chọn nav đúng theo role
-  const navItems = isAdmin ? ADMIN_NAV : isOwner ? OWNER_NAV : RENTER_NAV
+  const [profile, setProfile]           = useState(null)
+  const [loading, setLoading]           = useState(true)
+  const [saving,  setSaving]            = useState(false)
+  const [avatarPreview, setAvatarPreview] = useState(null)
+  const [avatarFile,    setAvatarFile]    = useState(null)
+  const [form, setForm] = useState({ name:'', phone:'', address:'', password:'' })
 
-  const roleLabel = {
-    [ROLES.ADMIN]: 'Quản Trị Viên',
-    [ROLES.OWNER]: 'Chủ Xe',
-    [ROLES.USER]:  'Người Thuê Xe',
-  }[user?.role] ?? user?.role
+  useEffect(() => {
+    getMyProfile()
+      .then(({ data }) => {
+        setProfile(data)
+        setForm({ name: data.name??'', phone: data.phone??'', address: data.address??'', password:'' })
+      })
+      .catch(() => {
+        setProfile({ name: user?.name, email: user?.email, role: user?.role })
+        setForm({ name: user?.name??'', phone:'', address:'', password:'' })
+      })
+      .finally(() => setLoading(false))
+  }, [])
 
-  function handleLogout() {
-    logout()
-    navigate('/')
+  function handleChange(e) { setForm(p => ({ ...p, [e.target.name]: e.target.value })) }
+
+  function handleAvatarChange(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    setAvatarFile(file)
+    setAvatarPreview(URL.createObjectURL(file))
   }
+
+  async function handleSave(e) {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const fd = new FormData()
+      if (form.name)     fd.append('name',    form.name)
+      if (form.phone)    fd.append('phone',   form.phone)
+      if (form.address)  fd.append('address', form.address)
+      if (form.password) fd.append('password',form.password)
+      if (avatarFile)    fd.append('avatar',  avatarFile)
+      await updateMyProfile(fd)
+      toast.success('Cập nhật hồ sơ thành công! ✅')
+    } catch (err) {
+      toast.error(err.response?.data?.message ?? 'Cập nhật thất bại')
+    } finally { setSaving(false) }
+  }
+
+  const roleLabel = { [ROLES.ADMIN]:'Quản Trị Viên', [ROLES.OWNER]:'Chủ Xe', [ROLES.USER]:'Người Thuê Xe' }[user?.role] ?? user?.role
+  const displayName = form.name || profile?.name || user?.email || 'Người dùng'
+  const currentAvatar = avatarPreview || profile?.avatar || null
+
+  if (loading) return <DashboardLayout navItems={navItems}><LoadingSpinner /></DashboardLayout>
 
   return (
     <DashboardLayout navItems={navItems}>
-
-      <div className="max-w-lg">
+      <div className="max-w-2xl">
         <div className="mb-8">
           <h1 className="font-display text-3xl tracking-wide">HỒ SƠ CÁ NHÂN</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Thông tin tài khoản của bạn
-          </p>
+          <p className="text-gray-400 text-sm mt-1">Cập nhật thông tin tài khoản của bạn</p>
         </div>
 
-        {/* Avatar + tên */}
-        <div className="card p-6 flex items-center gap-5 mb-6">
-          <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center font-bold text-2xl shrink-0">
-            {getInitials(user?.name || user?.email || 'U')}
-          </div>
-          <div>
-            <p className="font-bold text-white text-lg">
-              {user?.name ?? 'Chưa cập nhật tên'}
-            </p>
-            <p className="text-gray-400 text-sm">{user?.email}</p>
-            <span className="text-xs font-bold text-primary uppercase tracking-wide mt-1 inline-block">
-              {roleLabel}
-            </span>
-          </div>
-        </div>
-
-        {/* Thông tin chi tiết */}
-        <div className="card p-6 space-y-4 mb-6">
-          <h2 className="font-bold text-white">Thông Tin Tài Khoản</h2>
-
-          {[
-            { label: 'ID Tài Khoản', value: user?.id  ?? '—' },
-            { label: 'Email',        value: user?.email ?? '—' },
-            { label: 'Role',         value: roleLabel },
-          ].map(({ label, value }) => (
-            <div key={label} className="flex items-center justify-between py-3 border-b border-white/8 last:border-0">
-              <span className="text-sm text-gray-400">{label}</span>
-              <span className="text-sm font-medium text-white">{value}</span>
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Avatar */}
+          <div className="card p-6">
+            <div className="flex items-center gap-6">
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-primary flex items-center justify-center">
+                  {currentAvatar
+                    ? <img src={currentAvatar} alt="avatar" className="w-full h-full object-cover" />
+                    : <span className="text-2xl font-bold">{getInitials(displayName)}</span>
+                  }
+                </div>
+                <button type="button" onClick={() => fileRef.current.click()}
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center text-sm hover:bg-primary-dark">
+                  📷
+                </button>
+                <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-white">{displayName}</p>
+                <p className="text-gray-400 text-sm">{profile?.email ?? user?.email}</p>
+                <span className="inline-block mt-1 text-xs font-bold text-primary uppercase tracking-wide">{roleLabel}</span>
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        {/* Ghi chú */}
-        <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl mb-6">
-          <p className="text-blue-400 text-sm">
-            💡 Tính năng chỉnh sửa hồ sơ (tên, số điện thoại, ảnh đại diện) sẽ
-            được bổ sung khi backend cung cấp API cập nhật thông tin người dùng.
-          </p>
-        </div>
+          {/* Thông tin */}
+          <div className="card p-6 space-y-4">
+            <h2 className="font-bold text-white mb-2">Thông Tin Cá Nhân</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="label">Họ Và Tên</label>
+                <input name="name" value={form.name} onChange={handleChange} placeholder="Nguyễn Văn A" className="input" />
+              </div>
+              <div>
+                <label className="label">Số Điện Thoại</label>
+                <input name="phone" value={form.phone} onChange={handleChange} placeholder="0901234567" className="input" />
+              </div>
+            </div>
+            <div>
+              <label className="label">Địa Chỉ</label>
+              <input name="address" value={form.address} onChange={handleChange} placeholder="123 Đường ABC, Quận 1, TP.HCM" className="input" />
+            </div>
+            <div>
+              <label className="label">Email</label>
+              <input value={profile?.email ?? user?.email ?? ''} disabled className="input opacity-50 cursor-not-allowed" />
+              <p className="text-xs text-gray-500 mt-1">Email không thể thay đổi</p>
+            </div>
+          </div>
 
-        {/* Đăng xuất */}
-        <button
-          onClick={handleLogout}
-          className="btn-danger btn w-full py-3"
-        >
-          🚪 Đăng Xuất Khỏi Tài Khoản
-        </button>
+          {/* Đổi mật khẩu */}
+          <div className="card p-6">
+            <h2 className="font-bold text-white mb-4">Đổi Mật Khẩu</h2>
+            <label className="label">Mật Khẩu Mới</label>
+            <input type="password" name="password" value={form.password} onChange={handleChange}
+              placeholder="Để trống nếu không muốn đổi" className="input" />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button type="submit" disabled={saving} className="btn-primary btn px-8 py-3">
+              {saving ? 'Đang lưu...' : '💾 Lưu Thay Đổi'}
+            </button>
+            <button type="button" onClick={() => { logout(); navigate('/') }} className="btn-danger btn">
+              🚪 Đăng Xuất
+            </button>
+          </div>
+        </form>
       </div>
     </DashboardLayout>
   )

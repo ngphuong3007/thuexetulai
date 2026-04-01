@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3001,
+    port: 3003,
     // Proxy API calls tới backend để tránh lỗi CORS khi dev
     proxy: {
       '/api': {

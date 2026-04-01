@@ -14,8 +14,9 @@ export const ADMIN_NAV = [
   {
     label: 'Quản Lý',
     items: [
-      { to: '/admin',        icon: '📊', label: 'Tổng Quan'    },
-      { to: '/admin/cars',   icon: '🚗', label: 'Quản Lý Xe'   },
+      { to: '/admin',        icon: '📊', label: 'Tổng Quan'      },
+      { to: '/admin/users',  icon: '👥', label: 'Người Dùng'     },
+      { to: '/admin/cars',   icon: '🚗', label: 'Quản Lý Xe'     },
       { to: '/admin/posts',  icon: '📋', label: 'Duyệt Bài Đăng' },
     ],
   },

@@ -69,7 +69,8 @@
 
   /* Card */
   .card {
-    @apply bg-dark-4 rounded-xl;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    @apply bg-dark-4 border border-white/[8%] rounded-xl;
   }
+
+  /* Hoặc border-white/[.08] đều được */
 }
