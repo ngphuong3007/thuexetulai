@@ -6,6 +6,7 @@ const User = require('./src/models/User');
 const Car = require('./src/models/Car');
 const Booking = require('./src/models/Booking');
 const Post = require('./src/models/Post');
+const Review = require('./src/models/Review');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rental';
 
@@ -16,6 +17,7 @@ async function seed() {
 
     // Clear existing data (optional)
     await Booking.deleteMany({});
+    await Review.deleteMany({});
     await Post.deleteMany({});
     await Car.deleteMany({});
     await User.deleteMany({});
@@ -85,6 +87,16 @@ async function seed() {
       car: car2._id,
       active: true,
     });
+
+    await Review.create({
+      car: car1._id,
+      user: user1._id,
+      rating: 5,
+      comment: 'Xe sach, giao xe dung gio, se dat lai.',
+    });
+    car1.avgRating = 5;
+    car1.reviewCount = 1;
+    await car1.save();
 
     console.log(' Users:', [user1.email, user2.email, owner1.email]);
     console.log(' Cars:', [car1.plate, car2.plate]);
