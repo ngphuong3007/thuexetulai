@@ -14,9 +14,6 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// connect DB
-connectDB();
-
 // routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/cars', require('./routes/cars'));
@@ -33,4 +30,10 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const startServer = async () => {
+	await connectDB();
+	app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+};
+
+startServer();
