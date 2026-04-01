@@ -25,7 +25,7 @@ export default function BulletinBoardPage() {
   // Form tạo bài đăng mới
   const [form, setForm]       = useState({ postType: 'rent_request', title: '', content: '', location: '', budgetPerDay: '' })
   const [submitting, setSubmitting] = useState(false)
-
+  const [selectedImage, setSelectedImage] = useState(null) // State lưu file ảnh đã chọn
   function loadPosts() {
     const params = {}
     if (filter.postType) params.postType = filter.postType
@@ -63,6 +63,10 @@ export default function BulletinBoardPage() {
       toast.success('Đăng bài thành công! Chờ admin duyệt.')
       setShowForm(false)
       setForm({ postType: 'rent_request', title: '', content: '', location: '', budgetPerDay: '' })
+      setForm({ postType: 'rent_request', title: '', content: '', location: '', budgetPerDay: '' })
+      setSelectedImage(null)
+      setSelectedImage(null) // <--- Dán thêm dòng này vào đây (Dòng 66)
+
     } catch (err) {
       toast.error(err.response?.data?.message ?? 'Đăng bài thất bại')
     } finally {
@@ -131,16 +135,47 @@ export default function BulletinBoardPage() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
-                <button type="submit" disabled={submitting} className="btn-primary btn">
+              <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-800 mt-4">
+                {/* Nút Đăng Bài chính */}
+                <button 
+                  type="submit" 
+                  disabled={submitting} 
+                  className="btn-primary btn"
+                >
                   {submitting ? 'Đang đăng...' : '📤 Đăng Bài'}
                 </button>
-                <button type="button" onClick={() => setShowForm(false)} className="btn-outline btn">
+
+                {/* Nút Upload Ảnh */}
+                <label className="flex items-center gap-2 px-4 py-2 bg-[#2a2a2a] border border-gray-700 text-gray-300 rounded-lg cursor-pointer hover:bg-[#333] hover:border-primary hover:text-white transition-all">
+                  <span className="text-lg">📷</span>
+                  <span className="text-sm">Thêm ảnh</span>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={(e) => setSelectedImage(e.target.files[0])}
+                  />
+                </label>
+
+                {/* Nút Hủy */}
+                <button 
+                  type="button" 
+                  onClick={() => { setShowForm(false); setSelectedImage(null); }} 
+                  className="btn-outline btn"
+                >
                   Hủy
                 </button>
+
+                {/* Hiển thị trạng thái ảnh đã chọn */}
+                {selectedImage && (
+                  <div className="w-full text-xs text-emerald-400 mt-2 italic flex items-center gap-1">
+                    <span>✅ Đã chọn: {selectedImage.name}</span>
+                  </div>
+                )}
               </div>
             </form>
           </div>
+        
         )}
 
         {/* Bộ lọc */}

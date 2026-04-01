@@ -19,7 +19,7 @@ export default function SearchPage() {
   // Tất cả xe từ API
   const [allCars, setAllCars]   = useState([])
   const [loading, setLoading]   = useState(true)
-
+  const [activeChip, setActiveChip] = useState('Tất cả')
   // Bộ lọc
   const [filters, setFilters] = useState({
     location:  searchParams.get('location') || '',
@@ -132,6 +132,27 @@ export default function SearchPage() {
 
           {/* ── Danh sách xe ── */}
           <div className="flex-1 min-w-0">
+          {/* Thanh nút lọc nhanh tương tự mẫu */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              {['Tất cả', 'Sale', 'Hình thức thuê', 'Số chỗ', 'Hãng xe'].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setActiveChip(item)}
+                  className={`px-5 py-2 rounded-full border transition-all duration-300 text-sm flex items-center
+                    ${activeChip === item 
+                      ? 'bg-primary border-primary text-white shadow-lg' 
+                      : 'bg-[#1a1a1a] border-gray-700 text-gray-400 hover:border-primary hover:text-primary'
+                    }`}
+                >
+                  {item === 'Sale' && <span className="mr-2">⚡</span>}
+                  {item === 'Hình thức thuê' && <span className="mr-2">🤝</span>}
+                  {item === 'Số chỗ' && <span className="mr-2">🚗</span>}
+                  {item === 'Hãng xe' && <span className="mr-2">🌐</span>}
+                  {item}
+                </button>
+              ))}
+            </div>
             <p className="text-gray-400 text-sm mb-5">
               Tìm thấy <span className="text-white font-semibold">{filtered.length}</span> xe
             </p>
