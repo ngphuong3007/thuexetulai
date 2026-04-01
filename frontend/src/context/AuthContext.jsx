@@ -37,11 +37,16 @@ export function AuthProvider({ children }) {
     // Decode JWT payload để lấy thông tin user
     // JWT có dạng: header.payload.signature (base64)
     const payload = JSON.parse(atob(token.split('.')[1]))
+    // Backend có thể trả user object kèm token
+    const userFromRes = data.user || data.data || {}
+    console.log('Login debug:', { payload, userFromRes, data })
     const userData = {
-      id:    payload.id    || payload._id,
-      role:  payload.role,
-      email: credentials.email,
+      id:    payload.id   || payload._id  || userFromRes._id,
+      role:  payload.role || userFromRes.role,
+      email: userFromRes.email || credentials.email,
+      name:  userFromRes.name  || payload.name || '',
     }
+    console.log('Final userData:', userData)
 
     localStorage.setItem(TOKEN_KEY, token)
     localStorage.setItem(USER_KEY,  JSON.stringify(userData))
@@ -59,11 +64,12 @@ export function AuthProvider({ children }) {
     const { token } = data
 
     const payload = JSON.parse(atob(token.split('.')[1]))
+    const userFromRes2 = data.user || data.data || {}
     const userData = {
-      id:    payload.id    || payload._id,
-      role:  payload.role,
-      email: info.email,
-      name:  info.name,
+      id:    payload.id   || payload._id  || userFromRes2._id,
+      role:  payload.role || userFromRes2.role || info.role,
+      email: userFromRes2.email || info.email,
+      name:  userFromRes2.name  || info.name || '',
     }
 
     localStorage.setItem(TOKEN_KEY, token)

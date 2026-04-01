@@ -18,8 +18,8 @@ export default {
         },
       },
       fontFamily: {
-        sans:    ['DM Sans', 'sans-serif'],
-        display: ['Bebas Neue', 'cursive'],
+        sans:    ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
+        display: ['Bebas Neue', 'Impact', 'Arial Black', 'sans-serif'],
       },
     },
   },

@@ -28,6 +28,7 @@ import EditCarPage      from '../pages/owner/EditCarPage'
 // ── Admin pages (role: admin) ─────────────────────────────────
 import AdminDashboard   from '../pages/admin/AdminDashboard'
 import ManageCarsPage   from '../pages/admin/ManageCarsPage'
+import ManageUsersPage  from '../pages/admin/ManageUsersPage'
 import PendingPostsPage from '../pages/admin/PendingPostsPage'
 
 // ── Shared ────────────────────────────────────────────────────
@@ -63,6 +64,7 @@ export default function AppRouter() {
       {/* ── Admin ── */}
       <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
         <Route path="/admin"              element={<AdminDashboard />} />
+        <Route path="/admin/users"        element={<ManageUsersPage />} />
         <Route path="/admin/cars"         element={<ManageCarsPage />} />
         <Route path="/admin/posts"        element={<PendingPostsPage />} />
         <Route path="/admin/profile"      element={<ProfilePage />} />

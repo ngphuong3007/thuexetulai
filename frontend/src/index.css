@@ -2,74 +2,141 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Base ── */
-@layer base {
-  body {
-    @apply bg-dark-1 text-gray-100 font-sans antialiased;
-  }
+/* ── Scrollbar ── */
+::-webkit-scrollbar        { width: 6px; }
+::-webkit-scrollbar-track  { background: #1C1F27; }
+::-webkit-scrollbar-thumb  { background: #252931; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
-  /* Scrollbar tùy chỉnh cho toàn trang */
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-dark-2;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-dark-3 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-600;
-  }
+/* ── Body ── */
+body {
+  background-color: #111318;
+  color: #F3F4F6;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Tiện ích tái sử dụng ── */
-@layer components {
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* Button variants */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 14px; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
+  background-color: #E8390E;
+  color: #ffffff;
+  border: none;
+}
+.btn-primary:hover:not(:disabled) { background-color: #C02E0B; }
+.btn-primary:active:not(:disabled) { transform: scale(0.95); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-primary {
-    @apply btn bg-primary text-white hover:bg-primary-dark active:scale-95;
-  }
+.btn-outline {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 14px; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
+  background-color: transparent;
+  color: #D1D5DB;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.btn-outline:hover:not(:disabled) { border-color: #E8390E; color: #E8390E; }
+.btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-outline {
-    @apply btn border border-white/10 text-gray-300 hover:border-primary hover:text-primary;
-  }
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 14px; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
+  background-color: transparent; border: none; color: #9CA3AF;
+}
+.btn-ghost:hover:not(:disabled) { color: #fff; background-color: rgba(255,255,255,0.05); }
+.btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-ghost {
-    @apply btn text-gray-400 hover:text-white hover:bg-white/5;
-  }
+.btn-danger {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 14px; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
+  background-color: #DC2626; color: #fff; border: none;
+}
+.btn-danger:hover:not(:disabled) { background-color: #B91C1C; }
+.btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700;
-  }
+.btn-success {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 14px; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
+  background-color: #059669; color: #fff; border: none;
+}
+.btn-success:hover:not(:disabled) { background-color: #047857; }
+.btn-success:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-success {
-    @apply btn bg-emerald-600 text-white hover:bg-emerald-700;
-  }
+.btn-warning {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 14px; transition: all 0.2s;
+  cursor: pointer; font-family: inherit;
+  background-color: #EAB308; color: #000; border: none;
+}
+.btn-warning:hover:not(:disabled) { background-color: #CA8A04; }
+.btn-warning:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .btn-sm {
-    @apply px-3 py-1.5 text-xs;
-  }
+.btn-sm { padding: 6px 12px !important; font-size: 12px !important; }
 
-  /* Form input */
-  .input {
-    @apply w-full bg-dark-3 border border-white/10 text-gray-100 rounded-lg px-4 py-2.5 text-sm outline-none placeholder-gray-500 focus:border-primary transition-colors;
-  }
+/* ── Input ── */
+.input {
+  width: 100%;
+  background-color: #252931;
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #F3F4F6;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.input::placeholder { color: #6B7280; }
+.input:focus { border-color: #E8390E; }
+.input:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .label {
-    @apply block text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2;
-  }
+/* ── Label ── */
+.label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9CA3AF;
+  margin-bottom: 8px;
+}
 
-  /* Card */
-  .card {
-    @apply bg-dark-4 rounded-xl;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
+/* ── Card ── */
+.card {
+  background-color: #1E2129;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── Font display (Bebas Neue) ── */
+.font-display {
+  font-family: 'Bebas Neue', 'Impact', 'Arial Black', sans-serif !important;
 }

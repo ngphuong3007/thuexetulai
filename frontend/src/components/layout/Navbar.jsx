@@ -28,6 +28,13 @@ export default function Navbar() {
     [ROLES.USER]:  '/dashboard',
   }[user?.role] ?? '/dashboard'
 
+  // URL trang hồ sơ tùy theo role
+  const profileUrl = {
+    [ROLES.ADMIN]: '/admin/profile',
+    [ROLES.OWNER]: '/owner/profile',
+    [ROLES.USER]:  '/dashboard/profile',
+  }[user?.role] ?? '/dashboard/profile'
+
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-16 bg-dark-2/90 backdrop-blur-md border-b border-white/8">
       <div className="max-w-7xl mx-auto h-full px-5 flex items-center justify-between">
@@ -99,7 +106,7 @@ export default function Navbar() {
                         📊 Dashboard
                       </Link>
                       <Link
-                        to={`${dashboardUrl}/profile`}
+                        to={profileUrl}
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
                       >
