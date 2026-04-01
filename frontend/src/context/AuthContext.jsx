@@ -37,11 +37,13 @@ export function AuthProvider({ children }) {
     // Decode JWT payload để lấy thông tin user
     // JWT có dạng: header.payload.signature (base64)
     const payload = JSON.parse(atob(token.split('.')[1]))
+    console.log('🔍 JWT Payload:', payload)
     const userData = {
       id:    payload.id    || payload._id,
       role:  payload.role,
       email: credentials.email,
     }
+    console.log('✅ User Data:', userData)
 
     localStorage.setItem(TOKEN_KEY, token)
     localStorage.setItem(USER_KEY,  JSON.stringify(userData))
