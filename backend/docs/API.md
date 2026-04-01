@@ -12,6 +12,23 @@ Base URL: `http://localhost:5000/api`
   - Body: `{ "email":"a@example.com", "password":"secret" }`
   - Response: `{ "token": "<jwt>" }`
 
+- GET `/auth/me` (protected)
+  - Lấy thông tin hồ sơ user hiện tại.
+
+- PUT `/auth/me` (protected)
+  - Cập nhật hồ sơ user hiện tại.
+  - Hỗ trợ `JSON` hoặc `form-data` (để upload avatar).
+  - Fields: `name`, `phone`, `address`, `avatar(file)`
+
+- PATCH `/auth/change-password` (protected)
+  - Body example:
+    ```json
+    {
+      "currentPassword": "old_password",
+      "newPassword": "new_password_123"
+    }
+    ```
+
 Notes: send header `Authorization: Bearer <token>` for protected routes.
 
 ## Cars
@@ -25,6 +42,7 @@ Notes: send header `Authorization: Bearer <token>` for protected routes.
 
 - GET `/cars/:id`
   - Get single car detail.
+  - Bao gồm `avgRating`, `reviewCount`, `latestReviews`.
 
 - POST `/cars` (protected)
   - Role: admin, owner
@@ -58,9 +76,9 @@ Notes: send header `Authorization: Bearer <token>` for protected routes.
     ```json
     {
       "postType":"rent_request",
-      "title":"Can thue xe 7 cho",
-      "content":"Can xe tu 5 den 8, gia hop ly",
-      "location":"Da Nang",
+      "title":"Cần thuê xe 5 chỗ",
+      "content":"Cần xe từ 5 - 7 chỗ",
+      "location":"Đà Nẵng",
       "budgetPerDay":900000
     }
     ```
@@ -68,9 +86,9 @@ Notes: send header `Authorization: Bearer <token>` for protected routes.
     ```json
     {
       "postType":"car_offer",
-      "title":"Cho thue Honda City",
+      "title":"Cho thuê xe",
       "content":"Xe dep, bao duong day du",
-      "location":"Ha Noi",
+      "location":"Hà Nội",
       "contactPhone":"0900000000",
       "car":"<carId>"
     }
@@ -91,11 +109,11 @@ Notes: send header `Authorization: Bearer <token>` for protected routes.
 
 - PATCH `/posts/admin/:id/approve` (protected)
   - Role: admin
-  - Body optional: `{ "reviewNote": "Noi dung hop le" }`
+  - Body optional: `{ "reviewNote": "Nội dụng hợp lệ" }`
 
 - PATCH `/posts/admin/:id/reject` (protected)
   - Role: admin
-  - Body optional: `{ "reviewNote": "Thieu thong tin" }`
+  - Body optional: `{ "reviewNote": "Thiếu thông tin" }`
 
 ## Bookings
 
@@ -112,6 +130,28 @@ Notes: send header `Authorization: Bearer <token>` for protected routes.
 
 - GET `/bookings` (protected)
   - Returns bookings for the authenticated user (populated `car`).
+
+## Reviews (Comments + Stars)
+
+- GET `/reviews/car/:carId`
+  - Public.
+  - Lấy danh sách bình luận + đánh giá sao của xe.
+
+- POST `/reviews/car/:carId` (protected)
+  - Mỗi user chỉ được review 1 lần cho 1 xe.
+  - Body example:
+    ```json
+    {
+      "rating": 5,
+      "comment": "Xe rất tốt"
+    }
+    ```
+
+- PUT `/reviews/:id` (protected)
+  - Chủ review hoặc admin được sửa.
+
+- DELETE `/reviews/:id` (protected)
+  - Chủ review hoặc admin được xóa.
 
 ## Errors
 

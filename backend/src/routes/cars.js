@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Car = require('../models/Car');
+const Review = require('../models/Review');
 const auth = require('../middleware/auth');
 const requireRoles = require('../middleware/requireRoles');
 const uploadCarImages = require('../middleware/uploadCarImages');
@@ -63,7 +64,16 @@ router.get('/:id', async (req, res) => {
     }
     const car = await Car.findById(req.params.id).populate('owner', 'name email role');
     if (!car) return res.status(404).json({ message: 'Car not found' });
-    res.json(car);
+
+    const latestReviews = await Review.find({ car: car._id })
+      .populate('user', 'name role')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      ...car.toObject(),
+      latestReviews,
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

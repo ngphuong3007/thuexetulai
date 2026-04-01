@@ -11,6 +11,8 @@ const CarSchema = new mongoose.Schema(
     available: { type: Boolean, default: true },
     images: [String],
     location: { type: String },
+    avgRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
