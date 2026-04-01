@@ -29,6 +29,7 @@ import EditCarPage      from '../pages/owner/EditCarPage'
 import AdminDashboard   from '../pages/admin/AdminDashboard'
 import ManageCarsPage   from '../pages/admin/ManageCarsPage'
 import PendingPostsPage from '../pages/admin/PendingPostsPage'
+import PendingBookingsPage from '../pages/admin/PendingBookingsPage'
 
 // ── Shared ────────────────────────────────────────────────────
 import ProfilePage from '../pages/shared/ProfilePage'
@@ -64,6 +65,7 @@ export default function AppRouter() {
       <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
         <Route path="/admin"              element={<AdminDashboard />} />
         <Route path="/admin/cars"         element={<ManageCarsPage />} />
+        <Route path="/admin/bookings"     element={<PendingBookingsPage />} />
         <Route path="/admin/posts"        element={<PendingPostsPage />} />
         <Route path="/admin/profile"      element={<ProfilePage />} />
       </Route>
