@@ -4,8 +4,13 @@
 // Khi cần thay đổi, chỉ sửa ở đây một lần.
 // ============================================================
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const normalizeApiBaseUrl = (url) => {
+  const cleanUrl = (url || '').trim().replace(/\/+$/, '')
+  if (!cleanUrl) return 'https://thuexetulai.onrender.com/api'
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`
+}
+
+export const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL)
 
 // Key lưu token trong localStorage
 export const TOKEN_KEY = 'd2car_token'
