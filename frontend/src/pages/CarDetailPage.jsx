@@ -1,31 +1,25 @@
-// ============================================================
-// CarDetailPage.jsx
-// Trang chi tiết xe + form đặt xe.
-// ============================================================
-
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import toast           from 'react-hot-toast'
-import Navbar          from '../components/layout/Navbar'
-import Footer          from '../components/layout/Footer'
-import LoadingSpinner  from '../components/common/LoadingSpinner'
-import { getCarById }  from '../api/carsApi'
+import toast from 'react-hot-toast'
+import Navbar from '../components/layout/Navbar'
+import Footer from '../components/layout/Footer'
+import LoadingSpinner from '../components/common/LoadingSpinner'
+import ReviewSection from '../components/common/ReviewSection'
+import { getCarById } from '../api/carsApi'
 import { createBooking } from '../api/bookingsApi'
-import { useAuth }     from '../context/AuthContext'
-import { formatCurrency, calcDays, formatDate } from '../utils/formatters'
+import { useAuth } from '../context/AuthContext'
+import { formatCurrency, calcDays } from '../utils/formatters'
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80'
 
 export default function CarDetailPage() {
-  const { id }            = useParams()
-  const navigate          = useNavigate()
+  const { id }              = useParams()
+  const navigate            = useNavigate()
   const { isAuthenticated } = useAuth()
 
-  const [car, setCar]           = useState(null)
-  const [loading, setLoading]   = useState(true)
+  const [car, setCar]             = useState(null)
+  const [loading, setLoading]     = useState(true)
   const [activeImg, setActiveImg] = useState(0)
-
-  // Form đặt xe
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate]     = useState('')
   const [booking, setBooking]     = useState(false)
@@ -37,7 +31,6 @@ export default function CarDetailPage() {
       .finally(() => setLoading(false))
   }, [id])
 
-  // Tính tổng tiền
   const days  = startDate && endDate ? calcDays(startDate, endDate) : 0
   const total = days > 0 ? days * (car?.pricePerDay ?? 0) : 0
 
@@ -47,14 +40,8 @@ export default function CarDetailPage() {
       navigate('/login')
       return
     }
-    if (!startDate || !endDate) {
-      toast.error('Vui lòng chọn ngày nhận và trả xe')
-      return
-    }
-    if (days <= 0) {
-      toast.error('Ngày trả xe phải sau ngày nhận xe')
-      return
-    }
+    if (!startDate || !endDate) { toast.error('Vui lòng chọn ngày nhận và trả xe'); return }
+    if (days <= 0) { toast.error('Ngày trả xe phải sau ngày nhận xe'); return }
 
     setBooking(true)
     try {
@@ -62,15 +49,14 @@ export default function CarDetailPage() {
       toast.success('Đặt xe thành công! Chờ xác nhận từ chủ xe 🎉')
       navigate('/dashboard/bookings')
     } catch (err) {
-      toast.error(err.response?.data?.message ?? 'Đặt xe thất bại, vui lòng thử lại')
+      toast.error(err.response?.data?.message ?? 'Đặt xe thất bại')
     } finally {
       setBooking(false)
     }
   }
 
   if (loading) return <><Navbar /><LoadingSpinner /></>
-
-  if (!car) return <><Navbar /><div className="pt-20 text-center text-gray-400 py-20">Không tìm thấy xe</div></>
+  if (!car)    return <><Navbar /><div className="pt-20 text-center text-gray-400 py-20">Không tìm thấy xe</div></>
 
   const images = car.images?.length ? car.images : [PLACEHOLDER]
 
@@ -80,7 +66,7 @@ export default function CarDetailPage() {
 
       <div className="max-w-6xl mx-auto px-5 pt-24 pb-16">
 
-        {/* Back link */}
+        {/* Back */}
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6 transition-colors"
@@ -90,7 +76,7 @@ export default function CarDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* ── Phần trái: Ảnh + thông tin ── */}
+          {/* ── Trái: Ảnh + thông tin ── */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Gallery */}
@@ -126,13 +112,11 @@ export default function CarDetailPage() {
               <p className="text-gray-400 flex items-center gap-1 mb-6">
                 📍 {car.location ?? '—'}
               </p>
-
-              {/* Specs grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { icon: '🚗', label: 'Hãng Xe',   value: car.make },
-                  { icon: '📅', label: 'Năm SX',    value: car.year },
-                  { icon: '🔑', label: 'Biển Số',   value: car.plate },
+                  { icon: '🚗', label: 'Hãng Xe',    value: car.make },
+                  { icon: '📅', label: 'Năm SX',     value: car.year },
+                  { icon: '🔑', label: 'Biển Số',    value: car.plate },
                   { icon: '✅', label: 'Trạng Thái', value: car.available ? 'Còn trống' : 'Đã cho thuê' },
                 ].map(({ icon, label, value }) => (
                   <div key={label} className="bg-dark-3 rounded-xl p-4">
@@ -142,12 +126,17 @@ export default function CarDetailPage() {
                 ))}
               </div>
             </div>
+
+            {/* ══════════════════════════════════
+                PHẦN ĐÁNH GIÁ XE — thêm vào đây
+            ══════════════════════════════════ */}
+            <ReviewSection carId={car._id} />
+
           </div>
 
-          {/* ── Phần phải: Booking card ── */}
+          {/* ── Phải: Booking card ── */}
           <div>
             <div className="card p-6 sticky top-20">
-              {/* Giá */}
               <div className="mb-6">
                 <span className="font-display text-4xl text-primary">
                   {formatCurrency(car.pricePerDay)}
@@ -155,7 +144,6 @@ export default function CarDetailPage() {
                 <span className="text-gray-400 text-sm"> / ngày</span>
               </div>
 
-              {/* Chọn ngày */}
               <div className="space-y-4 mb-5">
                 <div>
                   <label className="label">📅 Ngày Nhận Xe</label>
@@ -179,14 +167,14 @@ export default function CarDetailPage() {
                 </div>
               </div>
 
-              {/* Tóm tắt giá */}
               {days > 0 && (
                 <div className="bg-dark-3 rounded-xl p-4 mb-5 space-y-2 text-sm">
                   <div className="flex justify-between text-gray-400">
                     <span>{formatCurrency(car.pricePerDay)} × {days} ngày</span>
                     <span>{formatCurrency(total)}</span>
                   </div>
-                  <div className="border-t border-white/8 pt-2 flex justify-between font-bold text-white">
+                  <div className="flex justify-between font-bold text-white pt-2"
+                    style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                     <span>Tổng Cộng</span>
                     <span className="text-primary">{formatCurrency(total)}</span>
                   </div>
@@ -206,6 +194,7 @@ export default function CarDetailPage() {
               </p>
             </div>
           </div>
+
         </div>
       </div>
 
