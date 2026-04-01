@@ -2,7 +2,12 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rental';
+    const uri = process.env.MONGO_URI;
+
+    if (!uri) {
+      throw new Error('Missing MONGO_URI in environment variables');
+    }
+
     // Newer mongoose versions don't require/use these options.
     await mongoose.connect(uri);
     console.log('MongoDB connected');
