@@ -3,10 +3,15 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/db');
 
 dotenv.config();
 const app = express();
+
+const uploadsRoot = path.join(__dirname, '../uploads');
+fs.mkdirSync(path.join(uploadsRoot, 'cars'), { recursive: true });
+fs.mkdirSync(path.join(uploadsRoot, 'avatars'), { recursive: true });
 
 // middleware
 app.use(express.json());
