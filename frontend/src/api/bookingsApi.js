@@ -21,3 +21,13 @@ export function createBooking(data) {
 export function getMyBookings() {
   return axiosClient.get('/bookings')
 }
+
+/** Admin: lấy toàn bộ đơn đặt xe */
+export function getAllBookingsForAdmin() {
+  return axiosClient.get('/bookings/admin/all')
+}
+
+/** Admin: cập nhật trạng thái đơn đặt xe */
+export function updateBookingStatus(id, status) {
+  return axiosClient.patch(`/bookings/admin/${id}/status`, { status })
+}
