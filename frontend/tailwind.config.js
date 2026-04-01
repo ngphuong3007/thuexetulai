@@ -17,6 +17,7 @@ export default {
         },
       },
       fontFamily: {
+<<<<<<< HEAD
         // Body font — fallback nếu Google Fonts chưa load
         sans: [
           'DM Sans',
@@ -32,6 +33,10 @@ export default {
           'Arial Black',
           'sans-serif',
         ],
+=======
+        sans:    ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
+        display: ['Bebas Neue', 'Impact', 'Arial Black', 'sans-serif'],
+>>>>>>> e12d25ea12f0291f526872e4ee85e47fdfff22a2
       },
     },
   },
