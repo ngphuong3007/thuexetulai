@@ -22,9 +22,9 @@ router.post('/register', async (req, res) => {
     const hashed = await bcrypt.hash(password, salt);
     user = new User({ name, email, password: hashed, role: finalRole });
     await user.save();
-    const payload = { id: user._id };
+    const payload = { id: user._id, role: user.role };
     const token = jwt.sign(payload, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-    res.json({ token });
+    res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -41,9 +41,9 @@ router.post('/login', async (req, res) => {
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: 'Invalid credentials' });
-    const payload = { id: user._id };
+    const payload = { id: user._id, role: user.role };
     const token = jwt.sign(payload, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
-    res.json({ token });
+    res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -104,6 +104,21 @@ router.patch('/change-password', auth, async (req, res) => {
     await user.save();
 
     res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// DEV ONLY - Set user role to admin (xóa sau khi không cần)
+router.post('/set-admin/:email', async (req, res) => {
+  try {
+    const user = await User.findOneAndUpdate(
+      { email: req.params.email },
+      { role: 'admin' },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'Set admin successfully', user });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
