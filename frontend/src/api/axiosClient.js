@@ -1,9 +1,6 @@
 // ============================================================
 // axiosClient.js
 // Instance Axios dùng chung cho toàn bộ app.
-// - Tự động thêm base URL
-// - Tự động đính kèm JWT token vào header
-// - Xử lý lỗi 401 (hết hạn token) → redirect về login
 // ============================================================
 
 import axios from 'axios'
@@ -11,7 +8,8 @@ import { API_BASE_URL, TOKEN_KEY } from '../utils/constants'
 
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
+  // KHÔNG đặt cứng Content-Type ở đây để Axios tự linh hoạt 
+  // giữa 'application/json' và 'multipart/form-data'
 })
 
 // ── Request Interceptor ──────────────────────────────────────
@@ -21,7 +19,16 @@ axiosClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+
+  // Nếu dữ liệu gửi đi KHÔNG phải là FormData, mới đặt là application/json
+  // Nếu là FormData (để upload ảnh), ta để trình duyệt tự xử lý.
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json'
+  }
+
   return config
+}, (error) => {
+  return Promise.reject(error)
 })
 
 // ── Response Interceptor ─────────────────────────────────────
@@ -31,7 +38,7 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem(TOKEN_KEY)
-      // Chuyển về trang login mà không reload toàn trang
+      // Chuyển về trang login
       window.location.href = '/login'
     }
     return Promise.reject(error)

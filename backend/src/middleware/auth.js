@@ -13,6 +13,9 @@ module.exports = async (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: 'User not found for this token' });
     }
+    if (!req.user.isActive) {
+      return res.status(403).json({ message: 'Account is inactive' });
+    }
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Token invalid' });
