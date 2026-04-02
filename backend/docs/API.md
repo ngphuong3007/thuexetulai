@@ -31,6 +31,34 @@ Base URL: `http://localhost:5000/api`
 
 Notes: send header `Authorization: Bearer <token>` for protected routes.
 
+## Admin - User Management
+
+- GET `/admin/users` (protected, admin)
+  - Query (optional): `q`, `role=user|owner|admin`, `isActive=true|false`, `page`, `limit`
+  - Response:
+    - `items`: danh sách user (không bao gồm password)
+    - `pagination`: `page`, `limit`, `total`, `totalPages`
+
+- GET `/admin/users/:id` (protected, admin)
+  - Lấy chi tiết 1 user.
+
+- PATCH `/admin/users/:id/profile` (protected, admin)
+  - Cập nhật hồ sơ: `name`, `email`, `phone`, `address`, `avatar`
+  - Không dùng endpoint này để đổi `role` hoặc `isActive`.
+
+- PATCH `/admin/users/:id/role` (protected, admin)
+  - Body: `{ "role": "user|owner|admin" }`
+  - Không cho admin tự đổi role của chính mình.
+
+- PATCH `/admin/users/:id/status` (protected, admin)
+  - Body: `{ "isActive": true|false }`
+  - Dùng để khóa/mở tài khoản.
+  - Không cho admin tự khóa tài khoản của chính mình.
+
+- DELETE `/admin/users/:id` (protected, admin)
+  - Xóa tài khoản user.
+  - Không cho admin tự xóa chính mình.
+
 ## Cars
 
 - GET `/cars`
