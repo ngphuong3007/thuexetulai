@@ -4,10 +4,10 @@
 // ============================================================
 
 import { useState, useEffect } from 'react'
-import { Link }           from 'react-router-dom'
-import DashboardLayout    from '../../components/layout/DashboardLayout'
-import LoadingSpinner     from '../../components/common/LoadingSpinner'
-import { getAllCars }     from '../../api/carsApi'
+import { Link } from 'react-router-dom'
+import DashboardLayout from '../../components/layout/DashboardLayout'
+import LoadingSpinner from '../../components/common/LoadingSpinner'
+import { getAllCars } from '../../api/carsApi'
 import { getAllBookingsForAdmin } from '../../api/bookingsApi'
 import { getPendingPosts } from '../../api/postsApi'
 
@@ -15,10 +15,11 @@ export const ADMIN_NAV = [
   {
     label: 'Quản Lý',
     items: [
-      { to: '/admin',        icon: '📊', label: 'Tổng Quan'    },
-      { to: '/admin/cars',   icon: '🚗', label: 'Quản Lý Xe'   },
+      { to: '/admin', icon: '📊', label: 'Tổng Quan' },
+      { to: '/admin/cars', icon: '🚗', label: 'Quản Lý Xe' },
+      { to: '/admin/users', icon: '👥', label: 'Người Dùng' },
       { to: '/admin/bookings', icon: '🗓️', label: 'Duyệt Đặt Xe' },
-      { to: '/admin/posts',  icon: '📋', label: 'Duyệt Bài Đăng' },
+      { to: '/admin/posts', icon: '📋', label: 'Duyệt Bài Đăng' },
     ],
   },
   {
@@ -30,7 +31,7 @@ export const ADMIN_NAV = [
 ]
 
 export default function AdminDashboard() {
-  const [cars, setCars]       = useState([])
+  const [cars, setCars] = useState([])
   const [pendingPosts, setPendingPosts] = useState([])
   const [pendingBookings, setPendingBookings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -42,7 +43,7 @@ export default function AdminDashboard() {
         setPendingPosts(postsRes.data)
         setPendingBookings(bookingsRes.data.filter((item) => item.status === 'pending'))
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false))
   }, [])
 
@@ -59,10 +60,10 @@ export default function AdminDashboard() {
           {/* Metric cards */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {[
-              { label: 'Tổng Xe',         value: cars.length,         color: 'text-primary'     },
-              { label: 'Xe Còn Trống',    value: cars.filter((c) => c.available).length, color: 'text-emerald-400' },
-              { label: 'Đơn Chờ Duyệt',  value: pendingBookings.length, color: 'text-orange-400' },
-              { label: 'Bài Chờ Duyệt',  value: pendingPosts.length,    color: 'text-yellow-400' },
+              { label: 'Tổng Xe', value: cars.length, color: 'text-primary' },
+              { label: 'Xe Còn Trống', value: cars.filter((c) => c.available).length, color: 'text-emerald-400' },
+              { label: 'Đơn Chờ Duyệt', value: pendingBookings.length, color: 'text-orange-400' },
+              { label: 'Bài Chờ Duyệt', value: pendingPosts.length, color: 'text-yellow-400' },
             ].map(({ label, value, color }) => (
               <div key={label} className="card p-5">
                 <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-2">{label}</p>
@@ -120,11 +121,10 @@ export default function AdminDashboard() {
                         {(car.pricePerDay / 1000).toFixed(0)}K
                       </td>
                       <td className="py-3">
-                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                          car.available
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${car.available
                             ? 'bg-emerald-500/15 text-emerald-400'
                             : 'bg-yellow-500/15 text-yellow-400'
-                        }`}>
+                          }`}>
                           {car.available ? 'Còn Trống' : 'Cho Thuê'}
                         </span>
                       </td>

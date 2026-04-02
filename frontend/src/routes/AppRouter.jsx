@@ -6,6 +6,8 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from '../components/common/ProtectedRoute'
+// Thêm import này
+import ManageUsersPage from '../pages/admin/ManageUsersPage'
 
 // ── Public pages ─────────────────────────────────────────────
 import HomePage         from '../pages/HomePage'
@@ -68,6 +70,7 @@ export default function AppRouter() {
         <Route path="/admin/bookings"     element={<PendingBookingsPage />} />
         <Route path="/admin/posts"        element={<PendingPostsPage />} />
         <Route path="/admin/profile"      element={<ProfilePage />} />
+        <Route path="/admin/users" element={<ManageUsersPage />} />
       </Route>
 
       {/* Redirect 404 về trang chủ */}
